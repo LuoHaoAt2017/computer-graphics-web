@@ -4,6 +4,17 @@ export default defineConfig({
   nodeModulesTransform: {
     type: 'none',
   },
-  routes: [{ path: '/', component: '@/pages/index' }],
+  routes: [
+    {
+      path: '/',
+      component: '@/layout',
+      routes: [
+        {
+          path: 'Geometry',
+          component: '@/pages/Geometry',
+        },
+      ],
+    },
+  ],
   fastRefresh: {},
 });
