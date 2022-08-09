@@ -23,8 +23,6 @@ import {
 import { useMount } from 'ahooks';
 import { useRef } from 'react';
 
-import styles from './index.less';
-
 export default function Geometry() {
   const ref = useRef<HTMLDivElement>(null);
 

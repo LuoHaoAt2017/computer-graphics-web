@@ -15,7 +15,13 @@ export default defineConfig({
         },
         {
           path: 'Light',
-          component: '@/pages/Light',
+          component: '@/pages/Light/index',
+          routes: [
+            {
+              path: 'Physical',
+              component: '@/pages/Light/Physical',
+            },
+          ],
         },
       ],
     },
