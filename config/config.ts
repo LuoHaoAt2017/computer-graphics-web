@@ -13,6 +13,10 @@ export default defineConfig({
           path: 'Geometry',
           component: '@/pages/Geometry',
         },
+        {
+          path: 'Light',
+          component: '@/pages/Light',
+        },
       ],
     },
   ],
