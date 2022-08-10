@@ -5,7 +5,8 @@ import {
   Mesh,
   PointLight,
   AmbientLight,
-  HemisphereLight,
+  PCFSoftShadowMap,
+  DirectionalLight,
   WebGLRenderer,
   Scene,
   Color,
@@ -15,6 +16,7 @@ import {
   TextureLoader,
   RepeatWrapping,
   MeshStandardMaterial,
+  CameraHelper,
 } from 'three';
 import { useMount } from 'ahooks';
 import { useRef } from 'react';
@@ -31,7 +33,55 @@ export default function Physical() {
     const scene = new Scene();
     scene.background = new Color(0x000000);
 
-    // 点光源自身如何可见 ？？？
+    const box = new BoxGeometry(20, 20, 20);
+    const texture0 = new TextureLoader().load(
+      require('@/assets/textures/hardwood2_bump.jpg'),
+    );
+    texture0.wrapS = texture0.wrapT = RepeatWrapping;
+    const hardwood0 = new MeshPhongMaterial({
+      map: texture0,
+      side: DoubleSide,
+    });
+    const object1 = new Mesh(box, hardwood0);
+    object1.castShadow = true;
+    object1.receiveShadow = false;
+    object1.position.x = 80;
+    object1.position.y = 10;
+    object1.position.z = 0;
+    scene.add(object1);
+
+    const sphere = new SphereGeometry(15, 15, 10);
+    const texture1 = new TextureLoader().load(
+      require('@/assets/textures/hardwood2_roughness.jpg'),
+    );
+    texture1.wrapS = texture1.wrapT = RepeatWrapping;
+    const hardwood1 = new MeshPhongMaterial({
+      map: texture1,
+      side: DoubleSide,
+    });
+    const object2 = new Mesh(sphere, hardwood1);
+    object2.castShadow = true;
+    object2.receiveShadow = false;
+    object2.position.x = -80;
+    object2.position.y = 15;
+    object2.position.z = 0;
+    scene.add(object2);
+
+    const plane = new PlaneGeometry(400, 240);
+    const texture2 = new TextureLoader().load(
+      require('@/assets/textures/hardwood2_diffuse.jpg'),
+    );
+    texture2.wrapS = texture2.wrapT = RepeatWrapping;
+    const hardwood2 = new MeshPhongMaterial({
+      map: texture2,
+      side: DoubleSide,
+    });
+    const object3 = new Mesh(plane, hardwood2);
+    object3.receiveShadow = true;
+    object3.rotateX(Math.PI / 2);
+    scene.add(object3);
+
+    // 点光源自身如何可见
     const pointLight = new PointLight(0xffffff, 1, 0, 2);
     const pointGeometry = new SphereGeometry(2, 16, 8);
     const pointMaterial = new MeshStandardMaterial({
@@ -52,66 +102,23 @@ export default function Physical() {
     ambientLight.position.setZ(0);
     scene.add(ambientLight);
 
-    const hemiLight = new HemisphereLight(0xddeeff, 0x0f0e0d, 0.02);
-    scene.add(hemiLight);
+    const directionalLight = new DirectionalLight(0x333333, 1.0);
+    directionalLight.position.set(80, 50, -100); //default; light shining from top
+    directionalLight.target = object1;
+    directionalLight.castShadow = true; // default false
+    scene.add(directionalLight);
 
-    const camera = new PerspectiveCamera(
-      45,
-      window.innerWidth / window.innerHeight,
-      1,
-      1000,
-    );
+    const helper = new CameraHelper(directionalLight.shadow.camera);
+    scene.add(helper);
+    const near = 1,
+      far = 1000,
+      fov = 45,
+      aspect = window.innerWidth / window.innerHeight;
+    const camera = new PerspectiveCamera(fov, aspect, near, far);
     camera.position.x = 0;
     camera.position.y = 200;
     camera.position.z = 300;
-
     scene.add(camera);
-
-    const box = new BoxGeometry(20, 20, 20);
-    const texture0 = new TextureLoader().load(
-      require('@/assets/textures/hardwood2_bump.jpg'),
-    );
-    texture0.wrapS = texture0.wrapT = RepeatWrapping;
-    const hardwood0 = new MeshPhongMaterial({
-      map: texture0,
-      side: DoubleSide,
-    });
-    const object1 = new Mesh(box, hardwood0);
-    object1.castShadow = true;
-    object1.position.x = 80;
-    object1.position.y = 10;
-    object1.position.z = 0;
-    scene.add(object1);
-
-    const sphere = new SphereGeometry(15, 15, 10);
-    const texture1 = new TextureLoader().load(
-      require('@/assets/textures/hardwood2_roughness.jpg'),
-    );
-    texture1.wrapS = texture1.wrapT = RepeatWrapping;
-    const hardwood1 = new MeshPhongMaterial({
-      map: texture1,
-      side: DoubleSide,
-    });
-    const object2 = new Mesh(sphere, hardwood1);
-    object2.castShadow = false;
-    object2.position.x = -80;
-    object2.position.y = 15;
-    object2.position.z = 0;
-    scene.add(object2);
-
-    const plane = new PlaneGeometry(400, 240);
-    const texture2 = new TextureLoader().load(
-      require('@/assets/textures/hardwood2_diffuse.jpg'),
-    );
-    texture2.wrapS = texture2.wrapT = RepeatWrapping;
-    const hardwood2 = new MeshPhongMaterial({
-      map: texture2,
-      side: DoubleSide,
-    });
-    const object3 = new Mesh(plane, hardwood2);
-    object3.receiveShadow = true;
-    object3.rotateX(Math.PI / 2);
-    scene.add(object3);
 
     const renderer = new WebGLRenderer({
       antialias: true,
@@ -120,6 +127,7 @@ export default function Physical() {
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = PCFSoftShadowMap;
     ref.current?.appendChild(renderer.domElement);
 
     let radian = 0.0;
