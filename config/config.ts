@@ -1,6 +1,7 @@
 import { defineConfig } from 'umi';
 
 export default defineConfig({
+  title: '基于Web端的计算机图形学',
   nodeModulesTransform: {
     type: 'none',
   },
@@ -19,7 +20,11 @@ export default defineConfig({
           routes: [
             {
               path: 'Physical',
-              component: '@/pages/Light/Physical',
+              component: '@/pages/Light/physical',
+            },
+            {
+              path: 'PointLight',
+              component: '@/pages/Light/pointLight',
             },
           ],
         },
