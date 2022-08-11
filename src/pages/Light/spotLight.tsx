@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  PointLight,
+  SpotLight,
   WebGLRenderer,
   PerspectiveCamera,
   SphereGeometry,
@@ -10,13 +10,17 @@ import {
   MeshBasicMaterial,
   DoubleSide,
   RepeatWrapping,
-  PointLightHelper,
+  SpotLightHelper,
+  CameraHelper,
   Scene,
   Mesh,
+  Object3D,
+  BoxGeometry,
+  AmbientLight,
 } from 'three';
 
-// 点光源
-class PointLightDemo extends React.Component {
+// 聚光源
+class SpotLightDemo extends React.Component {
   private scene = new Scene();
   private camera = new PerspectiveCamera(
     45,
@@ -24,27 +28,23 @@ class PointLightDemo extends React.Component {
     1,
     1000,
   );
-  private pointRedLight = new PointLight(0xff0000, 1);
-  private pointBlueLight = new PointLight(0x0000ff, 1);
+  private spotLight = new SpotLight(0xff0000, 1);
+  private ambientLight = new AmbientLight(0xffffff, 0.5);
   private renderer = new WebGLRenderer({ antialias: true });
   private ref = React.createRef<HTMLDivElement>();
   private R = 40;
-
-  constructor(props) {
-    super(props);
-    this.initializeRenderer();
-    this.initializeCamera();
-  }
 
   render(): React.ReactNode {
     return <div ref={this.ref}></div>;
   }
 
   componentDidMount() {
+    this.initializeRenderer();
+    this.initializeCamera();
     this.initialzeObjects();
-    this.initialzePointLight();
+    this.initialzeSpotLight();
     this.intialzeGround();
-    this.camera.lookAt(this.scene.position);
+    this.scene.add(this.ambientLight);
     this.ref.current?.appendChild(this.renderer.domElement);
 
     let radian = 0.01;
@@ -52,14 +52,10 @@ class PointLightDemo extends React.Component {
     const draw = () => {
       requestAnimationFrame(draw);
       radian = radian + speed;
-      this.pointRedLight.position.x = Math.sin(radian) * (this.R + 20);
-      this.pointRedLight.position.y = this.R;
-      this.pointRedLight.position.z = Math.cos(radian) * (this.R + 20);
-
-      this.pointBlueLight.position.x = Math.cos(radian) * (this.R + 20);
-      this.pointBlueLight.position.y = this.R;
-      this.pointBlueLight.position.z = Math.sin(radian) * (this.R + 20);
-
+      this.spotLight.position.x = 100 * Math.sin(radian);
+      this.spotLight.position.y = 200;
+      this.spotLight.position.z = 0;
+      this.camera.lookAt(this.scene.position);
       this.renderer.render(this.scene, this.camera);
     };
 
@@ -73,38 +69,52 @@ class PointLightDemo extends React.Component {
   }
 
   initializeCamera() {
-    this.camera.position.x = 200;
-    this.camera.position.y = 200;
-    this.camera.position.z = 200;
+    this.camera.position.x = 300;
+    this.camera.position.y = 300;
+    this.camera.position.z = 300;
     this.scene.add(this.camera);
+
+    const helper = new CameraHelper(this.spotLight.shadow.camera);
+    this.scene.add(helper);
   }
 
-  initialzePointLight() {
-    this.pointRedLight.castShadow = true;
-    const lightHelper = new PointLightHelper(this.pointRedLight, 2);
-    this.scene.add(lightHelper);
-    this.scene.add(this.pointRedLight);
-
-    this.pointBlueLight.castShadow = true;
-    const geometry = new SphereGeometry(2);
-    const material = new MeshBasicMaterial({ color: 0x0000ff }); // 不受光照的影响
-    this.pointBlueLight.add(new Mesh(geometry, material));
-    this.scene.add(this.pointBlueLight);
+  initialzeSpotLight() {
+    this.spotLight.castShadow = true;
+    const target = new Object3D();
+    target.position.x = 0;
+    target.position.y = 20;
+    target.position.z = 0;
+    this.spotLight.target = target;
+    this.spotLight.angle = Math.PI / 4;
+    this.spotLight.penumbra = 0.1;
+    this.spotLight.decay = 2;
+    this.scene.add(this.spotLight);
   }
 
   initialzeObjects() {
     const geometry = new SphereGeometry(this.R, this.R, this.R);
-    const material = new MeshPhongMaterial();
+    const material = new MeshPhongMaterial({
+      color: 0x0000ff,
+    });
     const sphere = new Mesh(geometry, material);
     sphere.position.x = 0;
-    sphere.position.y = 40;
+    sphere.position.y = this.R;
     sphere.position.z = 0;
     sphere.castShadow = true;
     this.scene.add(sphere);
+
+    const boxGeometry = new BoxGeometry(this.R, this.R, this.R);
+    const boxMaterial = new MeshPhongMaterial({ color: 0x00ff00 });
+    const boxMesh = new Mesh(boxGeometry, boxMaterial);
+    boxMesh.position.x = 4 * this.R;
+    boxMesh.position.y = this.R;
+    boxMesh.position.z = 0;
+    boxMesh.castShadow = true;
+    this.scene.add(boxMesh);
   }
 
   intialzeGround() {
-    const geometry = new PlaneGeometry(400, 400);
+    const geometry = new PlaneGeometry(900, 900);
     const texture = new TextureLoader().load(
       require('@/assets/textures/hardwood2_diffuse.jpg'),
     );
@@ -117,4 +127,4 @@ class PointLightDemo extends React.Component {
   }
 }
 
-export default PointLightDemo;
+export default SpotLightDemo;
