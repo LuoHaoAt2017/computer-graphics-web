@@ -27,6 +27,7 @@ class PointLightDemo extends React.Component {
   private pointBlueLight = new PointLight(0x0000ff, 1);
   private renderer = new WebGLRenderer({ antialias: true });
   private ref = React.createRef<HTMLDivElement>();
+  private R = 40;
 
   constructor(props) {
     super(props);
@@ -50,24 +51,18 @@ class PointLightDemo extends React.Component {
     const draw = () => {
       requestAnimationFrame(draw);
       radian = radian + speed;
-      this.pointRedLight.position.x = Math.sin(radian) * 20;
-      this.pointRedLight.position.z = Math.cos(radian) * 20;
+      this.pointRedLight.position.x = Math.sin(radian) * (this.R + 20);
+      this.pointRedLight.position.y = this.R;
+      this.pointRedLight.position.z = Math.cos(radian) * (this.R + 20);
 
-      this.pointBlueLight.position.x = Math.cos(radian) * 20;
-      this.pointBlueLight.position.z = Math.sin(radian) * 20;
+      this.pointBlueLight.position.x = Math.cos(radian) * (this.R + 20);
+      this.pointBlueLight.position.y = this.R;
+      this.pointBlueLight.position.z = Math.sin(radian) * (this.R + 20);
 
       this.renderer.render(this.scene, this.camera);
     };
 
     draw();
-  }
-
-  componentDidCatch() {}
-
-  componentDidUpdate() {}
-
-  shouldComponentUpdate() {
-    return true;
   }
 
   initializeRenderer() {
@@ -80,35 +75,28 @@ class PointLightDemo extends React.Component {
     this.camera.position.x = 200;
     this.camera.position.y = 200;
     this.camera.position.z = 200;
-    this.scene.add(this.cameraHelper);
     this.scene.add(this.camera);
   }
 
   initialzePointLight() {
-    this.pointRedLight.position.x = 0;
-    this.pointRedLight.position.y = 100;
-    this.pointRedLight.position.z = 0;
     this.pointRedLight.castShadow = true;
-    const lightHelper = new PointLightHelper(this.pointRedLight, 5);
+    const lightHelper = new PointLightHelper(this.pointRedLight, 2);
     this.scene.add(lightHelper);
     this.scene.add(this.pointRedLight);
 
-    this.pointBlueLight.position.x = 0;
-    this.pointBlueLight.position.y = 100;
-    this.pointBlueLight.position.z = 0;
     this.pointBlueLight.castShadow = true;
-    const geometry = new SphereGeometry(5, 5, 5);
-    const material = new MeshBasicMaterial({ color: 0xff0000 }); // 不受光照的影响
+    const geometry = new SphereGeometry(2);
+    const material = new MeshBasicMaterial({ color: 0x0000ff }); // 不受光照的影响
     this.pointBlueLight.add(new Mesh(geometry, material));
     this.scene.add(this.pointBlueLight);
   }
 
   initialzeObjects() {
-    const geometry = new SphereGeometry(20, 20, 20);
+    const geometry = new SphereGeometry(this.R, this.R, this.R);
     const material = new MeshPhongMaterial();
     const sphere = new Mesh(geometry, material);
     sphere.position.x = 0;
-    sphere.position.y = 20;
+    sphere.position.y = 40;
     sphere.position.z = 0;
     sphere.castShadow = true;
     this.scene.add(sphere);
