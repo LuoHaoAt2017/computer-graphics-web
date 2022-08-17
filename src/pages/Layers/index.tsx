@@ -15,8 +15,7 @@ import {
   PlaneBufferGeometry,
   MeshPhysicalMaterial,
 } from 'three';
-// 聚光源
-class ReactAreaLightDemo extends React.Component {
+class LayersDemo extends React.Component {
   private scene = new Scene();
   private camera = new PerspectiveCamera(
     45,
@@ -24,7 +23,7 @@ class ReactAreaLightDemo extends React.Component {
     1,
     1000,
   );
-  private ambientLight = new AmbientLight(0x666666, 0.5);
+  private ambientLight = new AmbientLight(0xcccccc, 0.5);
   private renderer = new WebGLRenderer({ antialias: true });
   private ref = React.createRef<HTMLDivElement>();
   private R = 30;
@@ -71,11 +70,6 @@ class ReactAreaLightDemo extends React.Component {
     const W = 50;
     const H = 100;
     const rectAreaLight1 = new RectAreaLight(0xff0000, 5, W, H);
-    const rectAreaLight2 = new RectAreaLight(0xffff00, 5, W, H);
-    const rectAreaLight3 = new RectAreaLight(0x00ff00, 5, W, H);
-    const rectAreaLight4 = new RectAreaLight(0x0000ff, 5, W, H);
-    const rectAreaLight5 = new RectAreaLight(0x00ffff, 5, W, H);
-    const rectAreaLight6 = new RectAreaLight(0xff00ff, 5, W, H);
 
     const geometry = new PlaneBufferGeometry();
     const material = new MeshPhysicalMaterial();
@@ -87,38 +81,6 @@ class ReactAreaLightDemo extends React.Component {
     rectAreaLight1.position.y = 50;
     rectAreaLight1.position.z = -100;
     rectAreaLight1.add(rectAreaLightMesh.clone());
-
-    rectAreaLight2.position.x = -100;
-    rectAreaLight2.position.y = 50;
-    rectAreaLight2.position.z = -100;
-    rectAreaLight2.add(rectAreaLightMesh.clone());
-
-    rectAreaLight3.position.x = 100;
-    rectAreaLight3.position.y = 50;
-    rectAreaLight3.position.z = -100;
-    rectAreaLight3.add(rectAreaLightMesh.clone());
-
-    rectAreaLight4.position.x = -100;
-    rectAreaLight4.position.y = 50;
-    rectAreaLight4.position.z = 100;
-    rectAreaLight4.add(rectAreaLightMesh.clone());
-
-    rectAreaLight5.position.x = 0;
-    rectAreaLight5.position.y = 50;
-    rectAreaLight5.position.z = 100;
-    rectAreaLight5.add(rectAreaLightMesh.clone());
-
-    rectAreaLight6.position.x = 100;
-    rectAreaLight6.position.y = 50;
-    rectAreaLight6.position.z = 100;
-    rectAreaLight6.add(rectAreaLightMesh.clone());
-
-    this.scene.add(rectAreaLight1);
-    this.scene.add(rectAreaLight2);
-    this.scene.add(rectAreaLight3);
-    this.scene.add(rectAreaLight4);
-    this.scene.add(rectAreaLight5);
-    this.scene.add(rectAreaLight6);
   }
 
   initialzeObjects() {
@@ -148,4 +110,4 @@ class ReactAreaLightDemo extends React.Component {
   }
 }
 
-export default ReactAreaLightDemo;
+export default LayersDemo;

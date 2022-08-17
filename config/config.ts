@@ -25,7 +25,7 @@ export default defineConfig({
             {
               path: 'PointLight',
               component: '@/pages/Light/pointLight',
-            }, //
+            },
             {
               path: 'SpotLight',
               component: '@/pages/Light/spotLight',
@@ -35,6 +35,10 @@ export default defineConfig({
               component: '@/pages/Light/rectAreaLight',
             },
           ],
+        },
+        {
+          path: 'Layers',
+          component: '@/pages/Layers',
         },
       ],
     },
